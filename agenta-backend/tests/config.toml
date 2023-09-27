@@ -1,0 +1,7 @@
+docker_registry_url="registry:5000"
+database_url="localhost:5432"
+registry="agenta-server"
+redis_url="redis://redis:6379/0"
+docker_hub_url="https://hub.docker.com/v2/repositories/{}/{}"
+docker_hub_repo_owner="agentaai"
+docker_hub_repo_name="templates"

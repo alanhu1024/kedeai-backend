@@ -1,0 +1,167 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Agenta AI",
+  "logo": {
+    "dark": "/logo/dark-complete-transparent-cropped.svg",
+    "light": "/logo/light-complete-transparent-cropped.svg",
+    "href": "https://agenta.ai"
+  },
+  "favicon": "/logo/favicon.png",
+  "colors": {
+    "primary": "#32bf40",
+    "light": "#00FF19",
+    "dark": "#00FF19"
+  },
+  "modeToggle": {
+    "default": "dark",
+    "isHidden": false
+  },
+  "feedback": {
+    "thumbsRating": true,
+    "suggestEdit": true,
+    "raiseIssue": true
+  },
+  "topbarLinks": [
+    {
+      "name": "Documentation",
+      "url": "https://docs.agenta.ai"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Try the demo",
+    "url": "https://demo.agenta.ai"
+  },
+  "anchors": [
+    {
+      "name": "Join our Slack",
+      "icon": "slack",
+      "url": "https://join.slack.com/t/agenta-hq/shared_invite/zt-1zsafop5i-Y7~ZySbhRZvKVPV5DO_7IA"
+    },
+    {
+      "name": "Star us on GitHub",
+      "icon": "github",
+      "url": "https://github.com/agenta-ai/agenta"
+    },
+    {
+      "name": "Try the demo",
+      "icon": "play",
+      "url": "https://demo.agenta.ai"
+    },
+    {
+      "name": "Book a 1:1 with the Founders",
+      "icon": "phone",
+      "url": "https://cal.com/mahmoud-mabrouk-ogzgey/demo"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Quickstart",
+      "pages": [
+        "quickstart/introduction",
+        "quickstart/getting-started-ui",
+        "quickstart/getting-started-code",
+        {
+          "group": "Installation",
+          "pages": [
+            "installation/local-installation/local-installation",
+            "installation/self-hosting/self-hosted-installation-aws",
+            "installation/self-hosting/self-hosted-installation-gcp"
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Tutorials",
+      "pages": [
+        "tutorials/your-first-llm-app"
+      ]
+    },
+    {
+      "group": "How-to Guides",
+      "pages": [
+        "howto/creating-multiple-app-variants",
+        "howto/how-to-debug"
+      ]
+    },
+    {
+      "group": "Conceptual Guides",
+      "pages": [
+        "conceptual/concepts",
+        "conceptual/architecture"
+      ]
+    },
+    {
+      "group": "Contributing",
+      "pages": [
+        "contributing/getting-started",
+        "contributing/development-mode",
+        "contributing/file-issue"
+      ]
+    },
+    {
+      "group": "Reference",
+      "pages": [
+        "reference/agenta-cli",
+        {
+          "group": "Backend API",
+          "pages": [
+            "backend_api/list-app-variants",
+            "backend_api/list-apps",
+            "backend_api/add-variant-from-image",
+            "backend_api/add-variant-from-previous",
+            "backend_api/start-variant",
+            "backend_api/stop-variant",
+            "backend_api/list-images",
+            "backend_api/remove-variant",
+            "backend_api/remove-app",
+            "backend_api/update-variant-parameters",
+            "backend_api/update-variant-image",
+            "backend_api/fetch-list-evaluations",
+            "backend_api/create-evaluation",
+            "backend_api/delete-evaluations",
+            "backend_api/fetch-evaluation",
+            "backend_api/update-evaluation-status-router",
+            "backend_api/fetch-evaluation-scenarios",
+            "backend_api/create-evaluation-scenario",
+            "backend_api/update-evaluation-scenario-router",
+            "backend_api/fetch-results",
+            "backend_api/upload-file",
+            "backend_api/create-testset",
+            {
+              "group": "testsets",
+              "pages": [
+                "backend_api/testsets/get-testset"
+              ]
+            },
+            "backend_api/update-testset",
+            "backend_api/get-testsets",
+            "backend_api/delete-testsets",
+            "backend_api/build-image"
+          ]
+        }
+      ]
+    }
+  ],
+  "api": {
+    "baseUrl": "http://localhost/api"
+  },
+  "footerSocials": {
+    "twitter": "https://twitter.com/agenta_ai",
+    "github": "https://github.com/agenta-ai"
+  },
+  "integrations": {
+    "intercom": "t228v7ci"
+  },
+  "analytics": {
+    "posthog": {
+      "apiKey": "phc_CwyyDlHGNnRFptVWhTe0HOeKnq1jeOZNk9hduYiOClp"
+    },
+    "hotjar": {
+      "hjid": "3547614",
+      "hjsv": "6"
+    },
+    "ga4": {
+      "measurementId": "G-LTF78FZS33"
+    }
+  }
+}
