@@ -104,9 +104,9 @@ async def retrieve_templates_from_dockerhub(
         tuple: A tuple containing two values.
     """
 
-    async with httpx.AsyncClient(proxies=proxies) as client:
+    async with httpx.AsyncClient() as client:
         response = await client.get(
-            f"{url.format(repo_owner, repo_name)}/tags", timeout=10
+            f"{url.format(repo_owner, repo_name)}/tags/list", timeout=10
         )
         if response.status_code == 200:
             response_data = response.json()
@@ -116,27 +116,28 @@ async def retrieve_templates_from_dockerhub(
         return response_data
 
 
-async def get_templates_info(url: str, repo_owner: str, repo_name: str) -> dict:
+async def get_templates_info(url: str, repo_user: str, repo_pass: str) -> dict:
     """
     Business logic to retrieve templates from DockerHub.
 
     Args:
         url (str): The URL endpoint for retrieving templates. Should contain placeholders `{}`
             for the `repo_owner` and `repo_name` values to be inserted. For example:
-            `https://hub.docker.com/v2/repositories/{}/{}/tags`.
-        repo_owner (str): The owner or organization of the repository from which templates are to be retrieved.
-        repo_name (str): The name of the repository where the templates are located.
+            `http://{}:{}@127.0.0.1:5000/v2`.
+        repo_user (str): The user for login to docker registry.
+        repo_pass (str): The pass for login to docker registry.
 
     Returns:
         tuple: A tuple containing two values.
     """
-    async with httpx.AsyncClient(proxies=proxies) as client:
-        response = await client.get(f"{url.format(repo_owner, repo_name)}/", timeout=10)
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{url.format(repo_user, repo_pass)}/_catalog", timeout=10)
         if response.status_code == 200:
             response_data = response.json()
             return response_data
 
         response_data = response.json()
+        print("response_data is:" + response_data)
         return response_data
 
 
@@ -172,9 +173,13 @@ async def pull_image_from_docker_hub(repo_name: str, tag: str) -> dict:
     Returns:
         Image: An image object from Docker Hub.
     """
-    async with Docker() as docker:
-        image = await docker.images.pull(repo_name, tag=tag)
-        return image
+    # 登录到 Docker Registry
+    client = docker.from_env()
+    client.login(username='admin', password='admin123', registry='127.0.0.1:5000')
+    # 使用 Docker SDK 拉取镜像
+    image = await client.images.pull(repo_name, tag=tag)
+
+    return image
 
 
 async def get_image_details_from_docker_hub(
