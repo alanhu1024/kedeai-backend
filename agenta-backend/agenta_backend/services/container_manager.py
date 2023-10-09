@@ -14,25 +14,19 @@ from fastapi import HTTPException
 from asyncio.exceptions import CancelledError
 from agenta_backend.models.api.api_models import Image
 
-
 client = docker.from_env()
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-proxies = {
-        "https://": "http://192.168.153.1:3389",
-        "http://": "http://192.168.153.1:3389"
-}
 
 def build_image_job(
-    app_name: str,
-    variant_name: str,
-    user_id: str,
-    tar_path: Path,
-    image_name: str,
-    temp_dir: Path,
+        app_name: str,
+        variant_name: str,
+        user_id: str,
+        tar_path: Path,
+        image_name: str,
+        temp_dir: Path,
 ) -> Image:
     """Business logic for building a docker image from a tar file
 
@@ -63,7 +57,7 @@ def build_image_job(
     shutil.unpack_archive(tar_path, temp_dir)
 
     try:
-        logger.info("image_name:"+image_name)
+        logger.info("image_name:" + image_name)
         image, build_log = client.images.build(
             path=str(temp_dir),
             tag=image_name,
@@ -88,7 +82,11 @@ def build_image_job(
 
 @backoff.on_exception(backoff.expo, (ConnectError, CancelledError), max_tries=5)
 async def retrieve_templates_from_dockerhub(
-    url: str, repo_owner: str, repo_name: str
+        url: str,
+        repo_user: str,
+        repo_pass: str,
+        repo_owner: str,
+        repo_name: str
 ) -> Union[List[dict], dict]:
     """
     Business logic to retrieve templates from DockerHub.
@@ -96,17 +94,22 @@ async def retrieve_templates_from_dockerhub(
     Args:
         url (str): The URL endpoint for retrieving templates. Should contain placeholders `{}`
             for the `repo_owner` and `repo_name` values to be inserted. For example:
-            `https://hub.docker.com/v2/repositories/{}/{}/tags`.
-        repo_owner (str): The owner or organization of the repository from which templates are to be retrieved.
-        repo_name (str): The name of the repository where the templates are located.
+            `http://{}:{}@127.0.0.1:5000/v2/tags/list`.
+        repo_user (str): The user for login to docker registry.
+        repo_pass (str): The pass for login to docker registry.
 
     Returns:
         tuple: A tuple containing two values.
+        :param url:
+        :param repo_user:
+        :param repo_pass:
+        :param repo_name:
+        :param repo_owner:
     """
 
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            f"{url.format(repo_owner, repo_name)}/tags/list", timeout=10
+    async with httpx.AsyncClient() as client_http:
+        response = await client_http.get(
+            f"{url.format(repo_user, repo_pass)}/{repo_owner}/{repo_name}/tags/list", timeout=10
         )
         if response.status_code == 200:
             response_data = response.json()
@@ -123,15 +126,15 @@ async def get_templates_info(url: str, repo_user: str, repo_pass: str) -> dict:
     Args:
         url (str): The URL endpoint for retrieving templates. Should contain placeholders `{}`
             for the `repo_owner` and `repo_name` values to be inserted. For example:
-            `http://{}:{}@127.0.0.1:5000/v2`.
+            `http://{}:{}@127.0.0.1:5000/v2/_catalog`.
         repo_user (str): The user for login to docker registry.
         repo_pass (str): The pass for login to docker registry.
 
     Returns:
         tuple: A tuple containing two values.
     """
-    async with httpx.AsyncClient() as client:
-        response = await client.get(f"{url.format(repo_user, repo_pass)}/_catalog", timeout=10)
+    async with httpx.AsyncClient() as client_http:
+        response = await client_http.get(f"{url.format(repo_user, repo_pass)}/_catalog", timeout=10)
         if response.status_code == 200:
             response_data = response.json()
             return response_data
@@ -162,7 +165,9 @@ async def check_docker_arch() -> str:
         return arch_mapping.get(info["Architecture"], "unknown")
 
 
-async def pull_image_from_docker_hub(repo_name: str, tag: str) -> dict:
+async def pull_image_from_docker_hub(repo_name: str, tag: str,
+                                     repo_user: str, repo_pass: str,
+                                     repo_loc: str) -> dict:
     """Bussiness logic to asynchronously pull an image from Docker Hub.
 
     Args:
@@ -172,10 +177,14 @@ async def pull_image_from_docker_hub(repo_name: str, tag: str) -> dict:
 
     Returns:
         Image: An image object from Docker Hub.
+        :param tag:
+        :param repo_name:
+        :param repo_loc:
+        :param repo_pass:
+        :param repo_user:
     """
     # 登录到 Docker Registry
-    client = docker.from_env()
-    client.login(username='admin', password='admin123', registry='127.0.0.1:5000')
+    client.login(username=repo_user, password=repo_pass, registry=repo_loc)
     # 使用 Docker SDK 拉取镜像
     image = await client.images.pull(repo_name, tag=tag)
 
@@ -183,7 +192,7 @@ async def pull_image_from_docker_hub(repo_name: str, tag: str) -> dict:
 
 
 async def get_image_details_from_docker_hub(
-    repo_owner: str, repo_name: str, image_name: str
+        repo_owner: str, repo_name: str, image_name: str
 ) -> str:
     """Retrieves the image details (specifically the image ID) from Docker Hub.
 

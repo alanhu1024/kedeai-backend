@@ -38,6 +38,9 @@ async def lifespan(application: FastAPI, cache=True):
     # Get docker hub config
     repo_owner = settings.docker_hub_repo_owner
     repo_name = settings.docker_hub_repo_name
+    repo_user = settings.docker_registry_user
+    repo_pass = settings.docker_registry_pass
+    repo_loc = settings.docker_registry_loc
 
     tags_data = await retrieve_templates_from_dockerhub_cached(cache=cache)
     templates_info_string = await retrieve_templates_info_from_dockerhub_cached(
@@ -69,7 +72,8 @@ async def lifespan(application: FastAPI, cache=True):
                     }
                 )
                 image_res = await pull_image_from_docker_hub(
-                    f"{repo_owner}/{repo_name}", tag["name"]
+                    f"{repo_owner}/{repo_name}", tag["name"],
+                    repo_user, repo_pass, repo_loc
                 )
                 print(f"Template {tag['id']} added to the database.")
                 print(f"Template Image {image_res[0]['id']} pulled from DockerHub.")

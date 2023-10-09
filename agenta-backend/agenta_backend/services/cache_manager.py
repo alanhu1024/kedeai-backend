@@ -36,8 +36,10 @@ async def retrieve_templates_from_dockerhub_cached(cache: bool) -> List[dict]:
     # If not cached, fetch data from Docker Hub and cache it in Redis
     response = await retrieve_templates_from_dockerhub(
         settings.docker_hub_url,
+        settings.docker_registry_user,
+        settings.docker_registry_pass,
         settings.docker_hub_repo_owner,
-        settings.docker_hub_repo_name,
+        settings.docker_hub_repo_name
     )
     response_data = response["results"]
 
@@ -63,8 +65,8 @@ async def retrieve_templates_info_from_dockerhub_cached(cache: bool) -> List[dic
     # If not cached, fetch data from Docker Hub and cache it in Redis
     response = await get_templates_info(
         settings.docker_hub_url,
-        settings.docker_hub_repo_owner,
-        settings.docker_hub_repo_name,
+        settings.docker_registry_user,
+        settings.docker_registry_pass,
     )
     response_data = response["full_description"]
 

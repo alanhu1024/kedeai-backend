@@ -38,18 +38,16 @@ else:
     )
     from agenta_backend.services.selectors import get_user_and_org_id
 
-
 router = APIRouter()
 
 
 @router.post("/build_image/")
 async def build_image(
-    app_name: str,
-    variant_name: str,
-    tar_file: UploadFile,
-    stoken_session: SessionContainer = Depends(verify_session()),
+        app_name: str,
+        variant_name: str,
+        tar_file: UploadFile,
+        stoken_session: SessionContainer = Depends(verify_session()),
 ) -> Image:
-
     """Takes a tar file and builds a docker image from it
 
     Arguments:
@@ -111,8 +109,8 @@ async def build_image(
 
 @router.post("/restart_container/")
 async def restart_docker_container(
-    payload: RestartAppContainer,
-    stoken_session: SessionContainer = Depends(verify_session()),
+        payload: RestartAppContainer,
+        stoken_session: SessionContainer = Depends(verify_session()),
 ) -> dict:
     """Restart docker container.
 
@@ -136,7 +134,7 @@ async def restart_docker_container(
 
 @router.get("/templates/")
 async def container_templates(
-    stoken_session: SessionContainer = Depends(verify_session()),
+        stoken_session: SessionContainer = Depends(verify_session()),
 ) -> Union[List[Template], str]:
     """Returns a list of container templates.
 
@@ -149,8 +147,8 @@ async def container_templates(
 
 @router.get("/templates/{image_name}/images/")
 async def pull_image(
-    image_name: str,
-    stoken_session: SessionContainer = Depends(verify_session()),
+        image_name: str,
+        stoken_session: SessionContainer = Depends(verify_session()),
 ) -> dict:
     """Pulls an image from Docker Hub using the provided configuration
 
@@ -164,11 +162,15 @@ async def pull_image(
     # Get docker hub config
     repo_owner = settings.docker_hub_repo_owner
     repo_name = settings.docker_hub_repo_name
+    repo_user = settings.docker_registry_user
+    repo_pass = settings.docker_registry_pass
+    repo_loc = settings.docker_registry_loc
 
     # Pull image from docker hub with provided config
     try:
         image_res = await pull_image_from_docker_hub(
-            f"{repo_owner}/{repo_name}", image_name
+            f"{repo_owner}/{repo_name}", image_name,
+            repo_user, repo_pass, repo_loc
         )
     except DockerError as ext:
         return JSONResponse(
@@ -185,9 +187,9 @@ async def pull_image(
 
 @router.get("/container_url/")
 async def construct_app_container_url(
-    app_name: str,
-    variant_name: str,
-    stoken_session: SessionContainer = Depends(verify_session()),
+        app_name: str,
+        variant_name: str,
+        stoken_session: SessionContainer = Depends(verify_session()),
 ) -> URI:
     """Construct and return the app container url path.
 
