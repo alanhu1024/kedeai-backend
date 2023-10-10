@@ -110,9 +110,9 @@ async def retrieve_templates_from_dockerhub(
     async with httpx.AsyncClient() as client_http:
         try:
             async with httpx.AsyncClient() as client_http:
-                url_to_load = f"{url.format(repo_user, repo_pass)}/{repo_owner}/{repo_name}/tags/list"
-                #print("url_to_load" + url_to_load)
-                response = await client_http.get(url_to_load, timeout=10)
+                url_to_load = f"{url}/{repo_owner}/{repo_name}/tags/list"
+                # print("url_to_load" + url_to_load)
+                response = await client_http.get(url_to_load, auth=(repo_user, repo_pass), timeout=10)
                 if response.status_code == 200:
                     response_data = response.json()
                     return response_data
