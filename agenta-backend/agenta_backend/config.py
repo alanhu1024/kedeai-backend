@@ -2,11 +2,13 @@ from pydantic import BaseSettings
 
 import os
 import toml
+from pathlib import Path
 from typing import Optional
 
 # Load the settings from the .toml file
-toml_config = toml.load("./config.toml")
+#toml_config = toml.load("./config.toml")
 
+toml_config = toml.load(f"{Path(__file__).parent}/config.toml")
 # Set the environment variables from the TOML configurations
 os.environ["DOCKER_REGISTRY_URL"] = toml_config["docker_registry_url"]
 os.environ["REGISTRY"] = toml_config["registry"]
