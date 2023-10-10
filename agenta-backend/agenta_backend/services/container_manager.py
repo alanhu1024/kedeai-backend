@@ -108,15 +108,21 @@ async def retrieve_templates_from_dockerhub(
     """
 
     async with httpx.AsyncClient() as client_http:
-        response = await client_http.get(
-            f"{url.format(repo_user, repo_pass)}/{repo_owner}/{repo_name}/tags/list", timeout=10
-        )
-        if response.status_code == 200:
-            response_data = response.json()
-            return response_data
+        try:
+            async with httpx.AsyncClient() as client_http:
+                url_to_load = f"{url.format(repo_user, repo_pass)}/{repo_owner}/{repo_name}/tags/list"
+                #print("url_to_load" + url_to_load)
+                response = await client_http.get(url_to_load, timeout=10)
+                if response.status_code == 200:
+                    response_data = response.json()
+                    return response_data
 
-        response_data = response.json()
-        return response_data
+                response_data = response.json()
+                return response_data
+
+        except Exception as e:
+            # 抛出自定义异常，将异常信息和url_to_load传递给异常类
+            raise Exception(str(e) + f"; url to load is : {url_to_load}.")
 
 
 async def get_templates_info(url: str, repo_user: str, repo_pass: str) -> dict:
