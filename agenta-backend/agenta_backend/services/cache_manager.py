@@ -20,7 +20,7 @@ def redis_connection() -> redis.Redis:
     return redis_client
 
 
-async def retrieve_templates_from_dockerhub_cached(cache: bool) -> List[dict]:
+async def retrieve_templates_from_dockerhub_cached(cache: bool,rep_name:str) -> List[dict]:
     """Retrieves templates from Docker Hub and caches the data in Redis for future use.
     Args:
         cache: A boolean value that indicates whether to use the cached data or not.
@@ -38,11 +38,10 @@ async def retrieve_templates_from_dockerhub_cached(cache: bool) -> List[dict]:
         settings.docker_hub_url,
         settings.docker_registry_user,
         settings.docker_registry_pass,
-        settings.docker_hub_repo_owner,
-        settings.docker_hub_repo_name
+        rep_name
     )
-    response_data = response["results"]
-
+    response_data = response
+    print("tags from docker registry:"+json.dumps(response_data))
     # Cache the data in Redis for 60 minutes
     r.set("templates_data", json.dumps(response_data), ex=900)
     return response_data
@@ -68,7 +67,7 @@ async def retrieve_templates_info_from_dockerhub_cached(cache: bool) -> List[dic
         settings.docker_registry_user,
         settings.docker_registry_pass,
     )
-    response_data = response["full_description"]
+    response_data = response
 
     # Cache the data in Redis for 60 minutes
     r.set("org_data", json.dumps(response_data), ex=900)

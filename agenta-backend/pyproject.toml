@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "agenta_backend"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 fastapi = "^0.95.1"
 pydantic = "^1.10.7"
 docker = "^6.1.1"
@@ -23,7 +23,7 @@ openai = "^0.27.8"
 langchain = "^0.0.256"
 odmantic = "^0.9.2"
 supertokens-python = "^0.15.1"
-restrictedpython = { version = "^6.2", python = ">=3.9,<3.12" }
+restrictedpython = { version = "^6.2", python = ">=3.10,<3.12" }
 
 
 [tool.poetry.group.dev.dependencies]

@@ -12,6 +12,9 @@ from typing import List, Union
 from fastapi import HTTPException
 
 from asyncio.exceptions import CancelledError
+
+import json
+
 from agenta_backend.models.api.api_models import Image
 
 client = docker.from_env()
@@ -85,8 +88,7 @@ async def retrieve_templates_from_dockerhub(
         url: str,
         repo_user: str,
         repo_pass: str,
-        repo_owner: str,
-        repo_name: str
+        rep_name: str
 ) -> Union[List[dict], dict]:
     """
     Business logic to retrieve templates from DockerHub.
@@ -110,8 +112,8 @@ async def retrieve_templates_from_dockerhub(
     async with httpx.AsyncClient() as client_http:
         try:
             async with httpx.AsyncClient() as client_http:
-                url_to_load = f"{url}/{repo_owner}/{repo_name}/tags/list"
-                # print("url_to_load" + url_to_load)
+                url_to_load = f"{url}/{rep_name}/tags/list"
+                print("url_to_load" + url_to_load)
                 response = await client_http.get(url_to_load, auth=(repo_user, repo_pass), timeout=10)
                 if response.status_code == 200:
                     response_data = response.json()
@@ -123,6 +125,65 @@ async def retrieve_templates_from_dockerhub(
         except Exception as e:
             # 抛出自定义异常，将异常信息和url_to_load传递给异常类
             raise Exception(str(e) + f"; url to load is : {url_to_load}.")
+
+
+@backoff.on_exception(backoff.expo, (ConnectError, CancelledError), max_tries=5)
+async def retrieve_manifests_from_dockerhub(
+        url: str,
+        repo_user: str,
+        repo_pass: str,
+        rep_name: str,
+        tag: str
+) -> dict:
+    """
+    Business logic to retrieve manifests from DockerRegistry.
+
+    Args:
+        url (str): The URL endpoint for retrieving templates. Should contain placeholders `{}`
+            for the `repo_owner` and `repo_name` values to be inserted. For example:
+            `http://{}:{}@127.0.0.1:5000/v2/tags/list`.
+        :param url:
+        :param repo_pass: The pass for login to docker registry.
+        :param repo_user: The user for login to docker registry.
+        :param tag:
+        :param rep_name:
+
+    Returns:
+                     "size": temp_info["size"],
+                    "architecture": temp_info["architecture"],
+                    "digest": temp_info["digest"],
+                    "status": temp_info["status"],
+                    "last_pushed": temp_info["last_pushed"],
+                    "media_type": rep_name["media_type"]
+
+    """
+
+    try:
+        async with httpx.AsyncClient() as client_http:
+            temp_info = {}
+            url_to_load = f"{url}/{rep_name}/manifests/{tag}"
+            print("url_manifest_to_load: " + url_to_load)
+            headers = {'Accept': 'application/vnd.docker.distribution.manifest.v2+json'}
+            response = await client_http.get(url_to_load, auth=(repo_user, repo_pass), timeout=10, headers=headers)
+            if response.status_code == 200:
+                response_data = response.json()
+                temp_info["media_type"] = response_data["mediaType"]
+                temp_info["size"] = response_data["config"]["size"]
+                temp_info["digest"] = response_data["config"]["digest"]
+
+            headers = {'Accept': 'application/vnd.docker.distribution.manifest.list.v2+json'}
+            response = await client_http.get(url_to_load, auth=(repo_user, repo_pass), timeout=10, headers=headers)
+            if response.status_code == 200:
+                response_data = response.json()
+                temp_info["architecture"] = response_data["architecture"]
+
+            temp_info["last_pushed"] = "dummy"
+            temp_info["status"] = "dummy"
+            return temp_info
+
+    except Exception as e:
+        # 抛出自定义异常，将异常信息和url_to_load传递给异常类
+        raise Exception(str(e) + f"; url to load is : {url_to_load}.")
 
 
 async def get_templates_info(url: str, repo_user: str, repo_pass: str) -> dict:
@@ -140,13 +201,13 @@ async def get_templates_info(url: str, repo_user: str, repo_pass: str) -> dict:
         tuple: A tuple containing two values.
     """
     async with httpx.AsyncClient() as client_http:
-        response = await client_http.get(f"{url.format(repo_user, repo_pass)}/_catalog", timeout=10)
+        response = await client_http.get(f"{url}/_catalog", auth=(repo_user, repo_pass), timeout=10)
         if response.status_code == 200:
             response_data = response.json()
             return response_data
 
         response_data = response.json()
-        print("response_data is:" + response_data)
+        print("response_data is:" + json.dumps(response_data))
         return response_data
 
 
