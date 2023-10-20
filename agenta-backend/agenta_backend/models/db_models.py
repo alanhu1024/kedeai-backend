@@ -61,7 +61,7 @@ class EnvironmentDB(Model):
 
 
 class TemplateDB(Model):
-    template_id: int
+    template_id: str
     name: str
     repo_name: str
     architecture: str
@@ -71,7 +71,7 @@ class TemplateDB(Model):
     digest: str
     status: str
     media_type: str
-    last_pushed: datetime
+    last_pushed: str
 
     class Config:
         collection = "templates"

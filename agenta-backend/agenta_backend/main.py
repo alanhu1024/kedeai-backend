@@ -80,7 +80,7 @@ async def lifespan(application: FastAPI, cache=False):
                 }
             )
             image_res = await pull_image_from_docker_hub(
-                f"{rep_name}", tag["name"],
+                f"{rep_name}", tag,
                 repo_user, repo_pass, repo_loc
             )
             print(f"Template {tag['id']} added to the database.")
