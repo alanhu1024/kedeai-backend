@@ -207,6 +207,8 @@ async def get_templates_info(url: str, repo_user: str, repo_pass: str) -> dict:
             if response.status_code == 200:
                 response_data = response.json()
                 return response_data
+            elif response.status_code == 401:
+                raise Exception(f" error  load url: {url_load}  ; Unauthorized")
 
             response_data = response.json()
             print("response_data is:" + json.dumps(response_data))
