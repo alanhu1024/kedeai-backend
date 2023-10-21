@@ -201,14 +201,18 @@ async def get_templates_info(url: str, repo_user: str, repo_pass: str) -> dict:
         tuple: A tuple containing two values.
     """
     async with httpx.AsyncClient() as client_http:
-        response = await client_http.get(f"{url}/_catalog", auth=(repo_user, repo_pass), timeout=10)
-        if response.status_code == 200:
-            response_data = response.json()
-            return response_data
+        try:
+            url_load = f"{url}/_catalog"
+            response = await client_http.get(url_load, auth=(repo_user, repo_pass), timeout=10)
+            if response.status_code == 200:
+                response_data = response.json()
+                return response_data
 
-        response_data = response.json()
-        print("response_data is:" + json.dumps(response_data))
-        return response_data
+            response_data = response.json()
+            print("response_data is:" + json.dumps(response_data))
+            return response_data
+        except Exception as e:
+            raise Exception(f" error  load url: {url_load}  ; {str(e)}") from e
 
 
 async def check_docker_arch() -> str:
