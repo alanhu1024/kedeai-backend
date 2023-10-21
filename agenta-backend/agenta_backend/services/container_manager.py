@@ -214,7 +214,7 @@ async def get_templates_info(url: str, repo_user: str, repo_pass: str) -> dict:
             print("response_data is:" + json.dumps(response_data))
             return response_data
         except Exception as e:
-            raise Exception(f" error  load url: {url_load}  ; {str(e)}") from e
+            raise Exception(f" error  load url: {url_load},{repo_user},{repo_pass}  ; {str(e)}") from e
 
 
 async def check_docker_arch() -> str:
