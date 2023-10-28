@@ -1,0 +1,3 @@
+app-name = "KedeAIGentq"
+backend_host = "http://agenta.kede.com/"
+variants = [ "app",]
