@@ -18,10 +18,10 @@ import json
 from agenta_backend.models.api.api_models import Image
 
 client = docker.from_env()
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
 
 def build_image_job(
         app_name: str,

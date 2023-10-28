@@ -8,7 +8,7 @@ from tempfile import TemporaryDirectory
 import docker
 from agenta.config import settings
 from docker.models.images import Image
-
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 

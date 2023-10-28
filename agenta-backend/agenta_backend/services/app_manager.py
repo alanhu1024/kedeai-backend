@@ -19,8 +19,8 @@ from agenta_backend.services import db_manager, docker_utils
 from docker.errors import DockerException
 
 logging.basicConfig(level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
 
 async def _fetch_app_variant_from_db(
     app_variant: AppVariant, **kwargs: dict

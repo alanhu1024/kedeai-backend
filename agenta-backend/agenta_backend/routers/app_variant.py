@@ -34,6 +34,7 @@ else:
     from agenta_backend.services.selectors import get_user_and_org_id
 
 router = APIRouter()
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 

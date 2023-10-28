@@ -16,6 +16,7 @@ client = docker.from_env()
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 

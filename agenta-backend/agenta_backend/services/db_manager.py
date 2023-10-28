@@ -1,7 +1,7 @@
 import logging
 import os
 from typing import Any, Dict, List
-
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
 from agenta_backend.models.api.api_models import (
     App,
     AppVariant,

@@ -7,6 +7,7 @@ from pathlib import Path
 import click
 import questionary
 import toml
+import logging
 from agenta.cli import variant_commands
 
 
@@ -29,10 +30,10 @@ def check_latest_version() -> Union[str, None]:
     import requests
 
     try:
-        response = requests.get("https://pypi.org/pypi/agenta/json")
-        response.raise_for_status()
-        latest_version = response.json()["info"]["version"]
-        return latest_version
+        #response = requests.get("https://pypi.org/pypi/agenta/json")
+        #response.raise_for_status()
+        #latest_version = response.json()["info"]["version"]
+        return None
     except (requests.RequestException, KeyError):
         return None
 
@@ -63,6 +64,7 @@ def notify_update(available_version: str):
     is_eager=True,
 )
 def cli():
+    logging.info("cli ok!")
     latest_version = check_latest_version()
     if latest_version:
         notify_update(latest_version)

@@ -291,6 +291,7 @@ def config_check(app_folder: str):
         )
         return
     host = get_host(app_folder)  # TODO: Refactor the whole config thing
+    print("host"+host)
     helper.update_config_from_backend(config_file, host=host)
 
 
@@ -332,7 +333,7 @@ def serve_cli(app_folder: str, file_name: str):
     try:
         config_check(app_folder)
     except Exception as e:
-        click.echo(click.style("Failed during configuration check.", fg="red"))
+        click.echo(click.style("Failed during configuration check sign.", fg="red"))
         click.echo(click.style(f"Error message: {str(e)}", fg="red"))
         return
 

@@ -5,7 +5,7 @@ from odmantic import AIOEngine
 from pymongo import MongoClient
 from motor.motor_asyncio import AsyncIOMotorClient
 
-
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 

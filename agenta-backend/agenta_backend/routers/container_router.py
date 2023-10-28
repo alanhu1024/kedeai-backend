@@ -2,6 +2,7 @@ import os
 import traceback
 import uuid
 import asyncio
+import logging
 from pathlib import Path
 from typing import List, Union
 
@@ -24,7 +25,9 @@ from agenta_backend.services.container_manager import (
     get_image_details_from_docker_hub,
     pull_image_from_docker_hub,
 )
-
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 if os.environ["FEATURE_FLAG"] in ["cloud", "ee", "demo"]:
     from agenta_backend.ee.services.auth_helper import (
         SessionContainer,
@@ -82,8 +85,9 @@ async def build_image(
         tar_path = temp_dir / tar_file.filename
         with tar_path.open("wb") as buffer:
             buffer.write(await tar_file.read())
-
+        logger.info(f"app_name | variant_name == {app_name.lower()} |   {variant_name.lower()}")
         image_name = f"agentaai/{app_name.lower()}_{variant_name.lower()}:latest"
+        logger.info(f"image_name == {image_name}")
 
         # Use the thread pool to run the build_image_job function in a separate thread
         future = loop.run_in_executor(
