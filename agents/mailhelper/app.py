@@ -56,5 +56,5 @@ def generate(
         email_style=email_style,
         email_content=email_content,
     )
-
+    print(f"output -> {output}")
     return output
