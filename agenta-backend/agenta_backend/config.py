@@ -18,6 +18,8 @@ os.environ["REDIS_URL"] = toml_config["redis_url"]
 os.environ["DOCKER_REGISTRY_USER"] = toml_config["docker_registry_user"]
 os.environ["DOCKER_REGISTRY_PASS"] = toml_config["docker_registry_pass"]
 os.environ["DOCKER_REGISTRY_LOC"] = toml_config["docker_registry_loc"]
+os.environ["DOCKER_HUB_REPO_OWNER"] = toml_config["docker_hub_repo_owner"]
+os.environ["DOCKER_HUB_REPO_NAME"] = toml_config["docker_hub_repo_name"]
 
 
 class Settings(BaseSettings):
@@ -29,6 +31,9 @@ class Settings(BaseSettings):
     docker_registry_user: str
     docker_registry_pass: str
     docker_registry_loc: str
+    docker_registry_loc: str
+    docker_hub_repo_owner: str
+    docker_hub_repo_name: str
 
 
 settings = Settings()

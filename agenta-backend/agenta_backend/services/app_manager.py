@@ -44,7 +44,6 @@ async def _fetch_app_variant_from_db(
         logger.error(f"Error fetching app variant from the database: {str(e)}")
         raise
 
-
 async def _fetch_image_from_db(
     app_variant: AppVariant, **kwargs: dict
 ) -> Optional[ImageExtended]:
@@ -328,6 +327,7 @@ async def start_variant(
 
     try:
         user = await db_manager.get_user_object(kwargs["uid"])
+        logger.info(f"user -> {user}")
         uri: URI = docker_utils.start_container(
             image_name=image.tags,
             app_name=app_variant.app_name,

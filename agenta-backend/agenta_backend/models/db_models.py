@@ -71,7 +71,7 @@ class TemplateDB(Model):
     digest: str
     status: str
     media_type: str
-    last_pushed: str
+    last_pushed: datetime
 
     class Config:
         collection = "templates"

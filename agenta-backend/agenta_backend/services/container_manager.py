@@ -257,6 +257,7 @@ async def pull_image_from_docker_hub(repo_name: str, tag: str,
         :param repo_user:
     """
     # 登录到 Docker Registry
+    logger.info(f"rempo_name== {repo_name},tag=={tag}")
     client.login(username=repo_user, password=repo_pass, registry=repo_loc)
     # 使用 Docker SDK 拉取镜像
     image = await client.images.pull(repo_name, tag=tag)

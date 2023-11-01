@@ -249,11 +249,13 @@ async def start_variant(
             }
         else:
             envvars = {} if env_vars is None else env_vars.env_vars
-
+        logger.info(f"app_variant -> {app_variant}")
         url = await app_manager.start_variant(app_variant, envvars, **kwargs)
+        logger.info(f"url -> {url}")
         return url
     except Exception as e:
         variant_from_db = await db_manager.get_variant_from_db(app_variant, **kwargs)
+        logger.info(f"variant_from_db={variant_from_db}")
         if variant_from_db is not None:
             await app_manager.remove_app_variant(app_variant, **kwargs)
         raise HTTPException(status_code=500, detail=str(e))
@@ -431,7 +433,8 @@ async def add_app_variant_from_template(
         envvars = {} if payload.env_vars is None else payload.env_vars
 
     # Create an Image instance with the extracted image id, and defined image name
-    image_name = f"agentaai/templates:{payload.image_tag}"
+    #image_name = f"agentaai/templates:{payload.image_tag}"
+    image_name = f"{payload.image_tag}"
     image: Image = Image(docker_id=payload.image_id, tags=f"{image_name}")
     variant_exist = await db_manager.get_variant_from_db(app_variant, **kwargs)
     if variant_exist is None:

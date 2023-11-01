@@ -12,6 +12,9 @@ from fastapi import UploadFile, APIRouter, Depends, HTTPException
 from agenta_backend.config import settings
 from aiodocker.exceptions import DockerError
 from concurrent.futures import ThreadPoolExecutor
+
+from agenta_backend.models.db_models import TemplateDB
+from agenta_backend.services import docker_utils
 from agenta_backend.services.docker_utils import restart_container
 from agenta_backend.models.api.api_models import (
     Image,
@@ -19,27 +22,22 @@ from agenta_backend.models.api.api_models import (
     Template,
     URI,
 )
-from agenta_backend.services.db_manager import get_templates, get_user_object
+from agenta_backend.services.db_manager import get_templates, get_user_object, add_template, find_template
 from agenta_backend.services.container_manager import (
     build_image_job,
     get_image_details_from_docker_hub,
     pull_image_from_docker_hub,
 )
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-if os.environ["FEATURE_FLAG"] in ["cloud", "ee", "demo"]:
-    from agenta_backend.ee.services.auth_helper import (
-        SessionContainer,
-        verify_session,
-    )
-    from agenta_backend.ee.services.selectors import get_user_and_org_id
-else:
-    from agenta_backend.services.auth_helper import (
-        SessionContainer,
-        verify_session,
-    )
-    from agenta_backend.services.selectors import get_user_and_org_id
+from agenta_backend.services.auth_helper import (
+    SessionContainer,
+    verify_session, authenticate_token,
+)
+
+from agenta_backend.services.selectors import get_user_and_org_id
 
 router = APIRouter()
 
@@ -149,6 +147,40 @@ async def container_templates(
     return templates
 
 
+@router.get("/images/")
+async def container_templates(
+        stoken_session: SessionContainer = Depends(verify_session()),
+) -> List[Image]:
+    """Returns a list of container templates.
+
+    Returns:
+        a list of `Template` objects.
+    """
+    images = docker_utils.list_images()
+    return images
+
+
+@router.put("/add_template/", dependencies=[Depends(authenticate_token)], )
+async def add_single_template(
+        template: Template,
+):
+    await add_template(
+        **{
+            "template_id": str(template.id),
+            "name": template.image.name,
+            "size": template.image.size,
+            "architecture": template.image.architecture,
+            "title": template.image.title,
+            "description": template.image.description,
+            "digest": template.image.digest,
+            "status": template.image.status,
+            "last_pushed": template.image.last_pushed,
+            "repo_name": template.image.repo_name,
+            "media_type": template.image.media_type,
+        }
+    )
+
+
 @router.get("/templates/{image_name}/images/")
 async def pull_image(
         image_name: str,
@@ -163,6 +195,18 @@ async def pull_image(
         -- a JSON response with the image tag name and image ID
         -- a JSON response with the pull_image exception error
     """
+    logger.info(f"image_name == {image_name}")
+
+    existing_template = await find_template(
+        image_name
+    )
+    logger.info(f"existing_template == {existing_template}")
+    if existing_template is not None:
+        repo_name = existing_template.repo_name
+        image = docker_utils.get_image(repo_name)
+        if image is not None:
+            return JSONResponse({"image_tag": image.tags, "image_id": image.docker_id}, 200)
+
     # Get docker hub config
     repo_owner = settings.docker_hub_repo_owner
     repo_name = settings.docker_hub_repo_name

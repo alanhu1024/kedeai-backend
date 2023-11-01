@@ -46,8 +46,13 @@ def list_images() -> List[Image]:
     return registry_images
 
 
+def get_image(name: str) -> Image:
+    dockerImg = client.images.get(name)
+    return Image(docker_id=dockerImg.id, tags=dockerImg.tags[0])
+
+
 def start_container(
-    image_name, app_name, variant_name, env_vars: DockerEnvVars, user_id: str
+        image_name, app_name, variant_name, env_vars: DockerEnvVars, user_id: str
 ) -> URI:
     try:
         image = client.images.get(f"{image_name}")

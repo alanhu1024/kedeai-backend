@@ -40,7 +40,7 @@ class TemplateImageInfo(BaseModel):
 
 
 class Template(BaseModel):
-    id: int
+    id: str
     image: TemplateImageInfo
 
 

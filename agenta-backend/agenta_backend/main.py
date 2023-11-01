@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from contextlib import asynccontextmanager
 
@@ -20,6 +21,10 @@ from agenta_backend.services.container_manager import pull_image_from_docker_hub
 from agenta_backend.services.db_manager import add_template, remove_old_template_from_db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 origins = [
     "http://localhost:3000",
@@ -87,7 +92,10 @@ async def lifespan(application: FastAPI, cache=False):
             print(f"Template Image {image_res[0]['id']} pulled from DockerHub.")
 
     # Remove old templates from database
-    await remove_old_template_from_db(templates_in_hub)
+    try:
+        await remove_old_template_from_db(templates_in_hub)
+    except Exception as e:
+        logger.error(e)
     yield
 
 

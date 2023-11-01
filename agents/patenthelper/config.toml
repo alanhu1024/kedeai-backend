@@ -1,0 +1,3 @@
+app-name = "patentana"
+backend_host = "http://agenta.kede.com/"
+variants = [ "app",]
